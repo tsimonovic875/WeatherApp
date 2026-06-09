@@ -20,6 +20,7 @@ class AplikacijaVremena:
         self.root.title("Aplikacija za prognozu vremena")
         self.root.geometry("1000x650")
         self.root.configure(bg="#1e293b")
+        self.vremenska_zona=0
         self.glavni_okvir = tk.Frame(root, bg="#1e293b")
         self.glavni_okvir.pack(fill="both", expand=True)
         
@@ -47,7 +48,8 @@ class AplikacijaVremena:
 
         tk.Button(
             okvir_za_dugmad,
-            text="Pretraži"
+            text="Pretraži",
+            command=self.trenutno_vrijeme
         ).pack(side="left", padx=5)
 
         tk.Button(
@@ -110,8 +112,6 @@ class AplikacijaVremena:
             self.label_info.config(
                 text=f"Vrijeme: {vrijeme}\nVlažnost: {vlaznost}%\nPritisak: {pritisak} hPa\nVjetar: {vjetar} m/s"
             )
-
- 
 
         except Exception as e:
             messagebox.showerror("Greška", str(e))
