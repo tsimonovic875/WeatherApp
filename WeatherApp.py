@@ -30,6 +30,32 @@ class AplikacijaVremena:
             justify="center"
         )
         self.unos_grad.pack(pady=10)
+
+        okvir_za_dugmad = tk.Frame(self.okvir1, bg="#1e293b")
+        okvir_za_dugmad.pack()
+
+        tk.Button(
+            okvir_za_dugmad,
+            text="Pretraži"
+        ).pack(side="left", padx=5)
+
+        tk.Button(
+            okvir_za_dugmad,
+            text="Moja lokacija"
+        ).pack(side="left", padx=5)
+
+        tk.Button(
+            okvir_za_dugmad,
+            text="⭐ Dodaj"
+        ).pack(side="left", padx=5)
+
+        self.label_ikona = tk.Label(
+            self.okvir1,
+            text="☀️",
+            font=("Segoe UI Emoji", 70),
+            bg="#1e293b"
+        )
+        self.label_ikona.pack()
 root = tk.Tk()
 app = AplikacijaVremena(root)
 root.mainloop()
