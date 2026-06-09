@@ -1,4 +1,5 @@
 import tkinter as tk
+import json,requests
 
 API_KEY = "06c921750b9a82d8f5d1294e1586276f"
 
@@ -41,7 +42,8 @@ class AplikacijaVremena:
 
         tk.Button(
             okvir_za_dugmad,
-            text="Moja lokacija"
+            text="Moja lokacija",
+            command=self.detektuj_lokaciju
         ).pack(side="left", padx=5)
 
         tk.Button(
@@ -56,6 +58,13 @@ class AplikacijaVremena:
             bg="#1e293b"
         )
         self.label_ikona.pack()
+    def detektuj_lokaciju(self):
+        try:
+            podaci = requests.get("https://ipinfo.io/json").json()
+            grad = podaci["city"]
+            print(grad)
+        except:
+            print("Nema pristup")
 root = tk.Tk()
 app = AplikacijaVremena(root)
 root.mainloop()
