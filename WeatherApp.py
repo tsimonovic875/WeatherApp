@@ -1,8 +1,18 @@
 import tkinter as tk
 import json,requests
+from tkinter import messagebox
 
 API_KEY = "06c921750b9a82d8f5d1294e1586276f"
 
+ikonice_vremena = {
+    "Clear": "☀️",
+    "Clouds": "☁️",
+    "Rain": "🌧️",
+    "Snow": "❄️",
+    "Thunderstorm": "⛈️",
+    "Drizzle": "🌦️",
+    "Mist": "🌫️"
+}
 
 class AplikacijaVremena:
     def __init__(self, root):
@@ -58,13 +68,66 @@ class AplikacijaVremena:
             bg="#1e293b"
         )
         self.label_ikona.pack()
+        self.label_info = tk.Label(
+            self.okvir1,
+            text="",
+            font=("Segoe UI", 14),
+            bg="#1e293b",
+            fg="white",
+            justify="left"
+        )
+        self.label_info.pack(pady=10)
+        self.label_vrijeme = tk.Label(
+            self.okvir1,
+            text="",
+            font=("Segoe UI", 22, "bold"),
+            bg="#1e293b",
+            fg="white"
+        )
+        self.label_vrijeme.pack()
+    def trenutno_vrijeme(self):
+
+        grad = self.unos_grad.get().strip()
+        if not grad:
+            return
+
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={grad}&appid={API_KEY}&units=metric"
+
+        try:
+            podaci = requests.get(url).json()
+
+            vrijeme = podaci["weather"][0]["main"]
+            temp = round(podaci["main"]["temp"])
+            vlaznost = podaci["main"]["humidity"]
+            pritisak = podaci["main"]["pressure"]
+            vjetar = podaci["wind"]["speed"]
+
+            self.vremenska_zona = podaci["timezone"]
+
+            self.label_ikona.config(text=ikonice_vremena.get(vrijeme, "🌍"))
+            self.label_vrijeme.config(text=f"{grad} • {temp}°C")
+
+            self.label_info.config(
+                text=f"Vrijeme: {vrijeme}\nVlažnost: {vlaznost}%\nPritisak: {pritisak} hPa\nVjetar: {vjetar} m/s"
+            )
+
+ 
+
+        except Exception as e:
+            messagebox.showerror("Greška", str(e))
+            
     def detektuj_lokaciju(self):
         try:
             podaci = requests.get("https://ipinfo.io/json").json()
             grad = podaci["city"]
-            print(grad)
+
+            self.unos_grad.delete(0, tk.END)
+            self.unos_grad.insert(0, grad)
+
+            self.trenutno_vrijeme()
+
         except:
-            print("Nema pristup")
+            messagebox.showerror("Greška", "Ne mogu lokaciju.")
 root = tk.Tk()
 app = AplikacijaVremena(root)
 root.mainloop()
