@@ -96,7 +96,15 @@ class AplikacijaVremena:
             fg="#38bdf8"
         )
         self.label_sat.pack()
-        
+        self.label_prognoza = tk.Label(
+            self.okvir1,
+            text="",
+            font=("Consolas", 12),
+            bg="#1e293b",
+            fg="white",
+            justify="left"
+        )
+        self.label_prognoza.pack(pady=20)
     def trenutno_vrijeme(self):
 
         grad = self.unos_grad.get().strip()
@@ -124,7 +132,9 @@ class AplikacijaVremena:
             )
 
             self.trenutno_sati()
-
+            lat = podaci["coord"]["lat"]
+            lon = podaci["coord"]["lon"]
+            self.duza_prognoza(lat, lon)
         except Exception as e:
             messagebox.showerror("Greška", str(e))
             
@@ -137,9 +147,32 @@ class AplikacijaVremena:
             self.unos_grad.insert(0, grad)
 
             self.trenutno_vrijeme()
-
+            
+            loc = podaci["loc"].split(",")
+            lat = float(loc[0])
+            lon = float(loc[1])
+            self.duza_prognoza(lat, lon)
         except:
-            messagebox.showerror("Greška", "Ne mogu lokaciju.")
+            messagebox.showerror("Greška", "Nema lokacije.")
+    def duza_prognoza(self, lat, lon):
+        url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API_KEY}&units=metric"
+
+        podaci = requests.get(url).json()
+
+        if "list" not in podaci:
+            self.label_prognoza.config(text="Greška prognoze")
+            return
+
+        tekst=""
+
+        for i in range(0, min(len(podaci["list"]), 40), 8):
+            s = podaci["list"][i]
+            datum = s["dt_txt"].split(" ")[0]
+            temp = round(s["main"]["temp"])
+            vr = s["weather"][0]["main"]
+            tekst += f"{datum}  {vr}  {temp}°C\n"
+
+        self.label_prognoza.config(text=tekst)
     def trenutno_sati(self):
         lokalno = datetime.utcnow() + timedelta(seconds=self.vremenska_zona)
         self.label_sat.config(text=lokalno.strftime("%H:%M:%S"))
