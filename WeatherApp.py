@@ -2,6 +2,7 @@ import tkinter as tk
 import json,requests
 from tkinter import messagebox
 from datetime import datetime, timedelta
+import os
 API_KEY = "06c921750b9a82d8f5d1294e1586276f"
 
 ikonice_vremena = {
@@ -21,7 +22,7 @@ class AplikacijaVremena:
         self.root.geometry("1000x650")
         self.root.configure(bg="#1e293b")
         self.vremenska_zona=0
-        self.omiljeni_gradovi = []
+        self.omiljeni_gradovi = self.ucitaj_gradove()
 
         self.glavni_okvir = tk.Frame(root, bg="#1e293b")
         self.glavni_okvir.pack(fill="both", expand=True)
@@ -108,6 +109,29 @@ class AplikacijaVremena:
             justify="left"
         )
         self.label_prognoza.pack(pady=20)
+
+        self.sidebar = tk.Frame(self.glavni_okvir, bg="#0f172a", width=220)
+        self.sidebar.pack(side="left", fill="y")
+
+        tk.Label(
+            self.sidebar,
+            text="⭐ Omiljeni",
+            bg="#0f172a",
+            fg="white",
+            font=("Segoe UI", 14, "bold")
+        ).pack(pady=10)
+
+        self.lista_gradova = tk.Listbox(
+            self.sidebar,
+            font=("Segoe UI", 11),
+            bg="#1e293b",
+            fg="white",
+            selectbackground="#38bdf8",
+            height=18
+        )
+        self.lista_gradova.pack(padx=10, pady=5, fill="both", expand=True)
+        self.osvjezi_listu()
+
     def trenutno_vrijeme(self):
 
         grad = self.unos_grad.get().strip()
@@ -147,7 +171,21 @@ class AplikacijaVremena:
 
         if grad not in self.omiljeni_gradovi:
             self.omiljeni_gradovi.append(grad)
+            self.sacuvaj_gradove()
+            self.osvjezi_listu()
+    def osvjezi_listu(self):
+        self.lista_gradova.delete(0, tk.END)
+        for g in self.omiljeni_gradovi:
+            self.lista_gradova.insert(tk.END, g)
+    def sacuvaj_gradove(self):
+        with open("omiljeni_gradovi.json", "w", encoding="utf-8") as f:
+            json.dump(self.omiljeni_gradovi, f, ensure_ascii=False)
 
+    def ucitaj_gradove(self):
+        if os.path.exists("omiljeni_gradovi.json"):
+            with open("omiljeni_gradovi.json", "r", encoding="utf-8") as f:
+                return json.load(f)
+        return []
     def detektuj_lokaciju(self):
         try:
             podaci = requests.get("https://ipinfo.io/json").json()
