@@ -1,7 +1,7 @@
 import tkinter as tk
 import json,requests
 from tkinter import messagebox
-
+from datetime import datetime, timedelta
 API_KEY = "06c921750b9a82d8f5d1294e1586276f"
 
 ikonice_vremena = {
@@ -87,6 +87,16 @@ class AplikacijaVremena:
             fg="white"
         )
         self.label_vrijeme.pack()
+
+        self.label_sat = tk.Label(
+            self.okvir1,
+            text="",
+            font=("Segoe UI", 18),
+            bg="#1e293b",
+            fg="#38bdf8"
+        )
+        self.label_sat.pack()
+        
     def trenutno_vrijeme(self):
 
         grad = self.unos_grad.get().strip()
@@ -113,6 +123,8 @@ class AplikacijaVremena:
                 text=f"Vrijeme: {vrijeme}\nVlažnost: {vlaznost}%\nPritisak: {pritisak} hPa\nVjetar: {vjetar} m/s"
             )
 
+            self.trenutno_sati()
+
         except Exception as e:
             messagebox.showerror("Greška", str(e))
             
@@ -128,6 +140,10 @@ class AplikacijaVremena:
 
         except:
             messagebox.showerror("Greška", "Ne mogu lokaciju.")
+    def trenutno_sati(self):
+        lokalno = datetime.utcnow() + timedelta(seconds=self.vremenska_zona)
+        self.label_sat.config(text=lokalno.strftime("%H:%M:%S"))
+        self.root.after(1000, self.trenutno_sati)
 root = tk.Tk()
 app = AplikacijaVremena(root)
 root.mainloop()
