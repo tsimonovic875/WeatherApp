@@ -21,6 +21,8 @@ class AplikacijaVremena:
         self.root.geometry("1000x650")
         self.root.configure(bg="#1e293b")
         self.vremenska_zona=0
+        self.omiljeni_gradovi = []
+
         self.glavni_okvir = tk.Frame(root, bg="#1e293b")
         self.glavni_okvir.pack(fill="both", expand=True)
         
@@ -60,7 +62,8 @@ class AplikacijaVremena:
 
         tk.Button(
             okvir_za_dugmad,
-            text="⭐ Dodaj"
+            text="⭐ Dodaj",
+            command=self.dodaj_u_omiljene
         ).pack(side="left", padx=5)
 
         self.label_ikona = tk.Label(
@@ -137,7 +140,14 @@ class AplikacijaVremena:
             self.duza_prognoza(lat, lon)
         except Exception as e:
             messagebox.showerror("Greška", str(e))
-            
+    def dodaj_u_omiljene(self):
+        grad = self.unos_grad.get().strip()
+        if not grad:
+            return
+
+        if grad not in self.omiljeni_gradovi:
+            self.omiljeni_gradovi.append(grad)
+
     def detektuj_lokaciju(self):
         try:
             podaci = requests.get("https://ipinfo.io/json").json()
